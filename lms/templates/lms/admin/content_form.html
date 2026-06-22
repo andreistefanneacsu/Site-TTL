@@ -1,0 +1,106 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Add {{ content_type }} - TTL Admin{% endblock %}
+
+{% block content %}
+<style>
+  select option {
+    background-color: #1e1e2f;
+    color: #fff;
+  }
+</style>
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Admin Management</p>
+    <a href="{% url 'accounts:manage_users' %}" class="sidebar-link"><i class="fa-solid fa-users"></i> Manage Users</a>
+    <a href="{% url 'lms:admin_manage_modules' %}" class="sidebar-link active"><i class="fa-solid fa-book"></i> Manage Content</a>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <div class="dashboard-header" style="border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 30px;">
+      <div>
+        <h2 class="dashboard-title">Add {{ content_type }} to {{ module.module_code }}</h2>
+        <a href="{% url 'lms:admin_module_details' module.id %}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;"><i class="fa-solid fa-arrow-left"></i> Back to {{ module.module_code }}</a>
+      </div>
+    </div>
+
+    <div class="card glass anim-up" style="max-width: 800px; padding: 2rem;">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Title</label>
+                <input type="text" name="title" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+            </div>
+
+            {% if content_type == 'Course' %}
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Display Order</label>
+                <input type="number" name="display_order" value="1" min="1" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Content (Theory)</label>
+                <textarea name="content" rows="10" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;"></textarea>
+            </div>
+            {% endif %}
+
+            {% if content_type == 'Laboratory' %}
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Instructions</label>
+                <textarea name="instructions" rows="4" style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;"></textarea>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Starting Topology (JSON)</label>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px;">Paste the JSON exported from Topology Tormentor Lite here.</p>
+                <textarea name="topology" rows="10" style="width: 100%; padding: 10px; background-color: #1e1e1e; color: #d4d4d4; border: 1px solid var(--border); border-radius: 4px; font-family: monospace; white-space: pre;"></textarea>
+            </div>
+            {% endif %}
+
+            {% if content_type == 'Exam' %}
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Exam Type</label>
+                    <select name="exam_type" style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+                        <option value="THEORY">Theory (Multiple Choice / Text)</option>
+                        <option value="PRACTICAL">Practical (Topology)</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Difficulty</label>
+                    <select name="difficulty" style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Max Score</label>
+                    <input type="number" step="0.01" name="max_score" value="10.00" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Passing Score</label>
+                    <input type="number" step="0.01" name="passing_score" value="5.00" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Requirement Text</label>
+                <textarea name="requirement_text" rows="3" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;"></textarea>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Continut Json</label>
+                <textarea name="topology" rows="10" style="width: 100%; padding: 10px; background-color: #1e1e1e; color: #d4d4d4; border: 1px solid var(--border); border-radius: 4px; font-family: monospace; white-space: pre;"></textarea>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <a href="{% url 'lms:admin_module_details' module.id %}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save {{ content_type }}</button>
+            </div>
+        </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

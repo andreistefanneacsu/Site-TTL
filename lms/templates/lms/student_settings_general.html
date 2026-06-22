@@ -1,0 +1,64 @@
+{% extends 'public/base.html' %}
+
+{% block title %}General Settings - TTL{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Student</p>
+    <a href="{% url 'lms:student_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-book"></i> Enrolled Courses</a>
+    <a href="{% url 'lms:my_results' %}" class="sidebar-link"><i class="fa-solid fa-chart-line"></i> My Results</a>
+    <a href="{% url 'lms:student_settings_general' %}" class="sidebar-link active"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="{% url 'accounts:profile' %}" class="sidebar-link"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">Settings</h2>
+      </div>
+    </div>
+
+    <!-- Tabs Header -->
+    <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px;">
+        <a href="{% url 'lms:student_settings_general' %}" style="padding: 10px 0; color: var(--primary); font-weight: bold; text-decoration: none; border-bottom: 2px solid var(--primary);">General</a>
+    </div>
+
+    <div style="max-width: 600px;">
+        <h3 style="margin-bottom: 10px;">General Preferences</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
+            Manage your account's general settings and interface preferences.
+        </p>
+        
+        <div style="background-color: var(--surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">First Name</label>
+                    <input type="text" name="first_name" value="{{ student.user.first_name }}" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Last Name</label>
+                    <input type="text" name="last_name" value="{{ student.user.last_name }}" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+                
+                <div class="mb-3" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Email</label>
+                    <input type="email" name="email" value="{{ student.user.email }}" required style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+                
+                <div class="mb-3" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">New Password</label>
+                    <input type="password" name="password" placeholder="Leave empty to keep current password" style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+                
+                <button type="submit" style="background-color: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Save Settings</button>
+            </form>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

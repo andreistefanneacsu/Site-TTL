@@ -1,0 +1,41 @@
+{% extends 'public/base.html' %}
+{% block title %}Modules{% endblock %}
+{% block nav_modules %}active{% endblock %}
+
+{% block content %}
+<div class="page-hero anim-up">
+  <span class="hero-eyebrow"><i class="fa-solid fa-book-open"></i> Curriculum</span>
+  <h2>Available Modules</h2>
+  <p>Explore our RETELISTICA-aligned curriculum designed for aspiring network engineers.</p>
+</div>
+
+<div class="content-wrap">
+  <div class="card-grid">
+    {% for module in modules %}
+    <div class="card module-card anim-up delay-{{ forloop.counter }}">
+      <div class="module-card-img">
+        {% if module.image_url %}
+          <img src="{{ module.image_url }}" alt="{{ module.title }}">
+        {% else %}
+          <i class="fa-solid fa-network-wired"></i>
+        {% endif %}
+      </div>
+      <div class="module-card-body">
+        <h3>{{ module.title }}</h3>
+        <p style="font-size:.88rem">{{ module.description|truncatewords:20 }}</p>
+        <div class="module-meta">
+          <span class="badge badge-accent"><i class="fa-solid fa-star"></i> {{ module.credits }} Credits</span>
+          <a href="{% url 'accounts:login' %}" class="btn btn-outline btn-sm">Enroll via LMS</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="card glass" style="grid-column:1/-1;text-align:center;padding:4rem">
+      <i class="fa-solid fa-circle-exclamation" style="font-size:3rem;color:var(--text-secondary);margin-bottom:1rem;display:block"></i>
+      <h3>No modules available yet</h3>
+      <p>Check back soon — we're adding content regularly.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

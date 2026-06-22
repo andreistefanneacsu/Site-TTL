@@ -1,0 +1,134 @@
+{% extends 'public/base.html' %}
+{% block title %}Grade Submission{% endblock %}
+{% block content %}
+<div style="min-height:100vh;padding:8rem 5% 4rem;max-width:900px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
+    <h2>Grade Submission</h2>
+    <a href="{% url 'lms:professor_dashboard' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
+  </div>
+
+  <!-- Student & Exam Info -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem">
+    <div class="card">
+      <h4 style="margin-bottom:1rem"><i class="fa-solid fa-user" style="color:var(--accent)"></i> Student</h4>
+      <p style="margin:0"><strong>{{ submission.student.user.first_name }} {{ submission.student.user.last_name }}</strong></p>
+      <p style="margin:0;font-size:.88rem">{{ submission.student.user.email }}</p>
+      <p style="margin:0;font-size:.88rem">Group: {{ submission.student.study_group }}</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-bottom:1rem"><i class="fa-solid fa-pen-to-square" style="color:var(--accent)"></i> Exam</h4>
+      <p style="margin:0"><strong>{{ submission.exam.title }}</strong></p>
+      <p style="margin:0;font-size:.88rem">{{ submission.exam.module.title }}</p>
+      <p style="margin:0;font-size:.88rem">Max: {{ submission.exam.max_score }} · Pass: {{ submission.exam.passing_score }}</p>
+    </div>
+  </div>
+
+  <!-- Requirements -->
+  <div class="card anim-up" style="margin-bottom:1.5rem">
+    <h4 style="margin-bottom:1rem"><i class="fa-solid fa-list-check" style="color:var(--accent)"></i> Requirements</h4>
+    <div style="background:rgba(0,0,0,.25);padding:1.5rem;border-radius:var(--radius-sm);font-size:.9rem;white-space:pre-wrap;color:var(--text-secondary);border:1px solid var(--border)">{{ submission.exam.requirement_text }}</div>
+  </div>
+
+  <!-- Student Answers -->
+  <div class="card anim-up" style="margin-bottom:1.5rem">
+    <h4 style="margin-bottom:1rem">Student's Answer</h4>
+    <div style="background:rgba(0,0,0,.25);padding:1.5rem;border-radius:var(--radius-sm);font-size:.9rem;white-space:pre-wrap;color:var(--text-secondary);border:1px solid var(--border)">
+      {% if submission.answers_json %}
+        {% if submission.answers_json.text_answers %}
+          {{ submission.answers_json.text_answers }}
+        {% else %}
+          {{ submission.answers_json }}
+        {% endif %}
+      {% elif submission.submitted_topology %}
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>Topology Submitted:</strong>
+          <button onclick="downloadJSON()" class="btn btn-outline btn-sm"><i class="fa-solid fa-download"></i> Download JSON</button>
+        </div><br>
+        <pre id="topology-json" style="color:var(--accent-2);white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;">{{ submission.submitted_topology | pprint }}</pre>
+        <script>
+        function downloadJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({{ submission.submitted_topology|safe }}, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "topology_{{ submission.student.user.last_name }}_{{ submission.exam.id }}.json");
+            dlAnchorElem.click();
+        }
+        </script>
+      {% else %}
+        No answer submitted.
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- AI Feedback (if present) -->
+  {% if submission.ai_feedback %}
+  <div class="card anim-up" style="margin-bottom:1.5rem;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06)">
+    <h4 style="color:var(--accent-2);margin-bottom:1rem"><i class="fa-solid fa-robot"></i> AI Grading Suggestion</h4>
+    <div style="display:flex;gap:1.5rem;align-items:center;margin-bottom:1rem">
+      <div style="text-align:center">
+        <div class="stat-value" style="font-size:2.5rem">{{ submission.grade|default:"—" }}</div>
+        <p style="margin:0;font-size:.8rem">Suggested Grade</p>
+      </div>
+      <p style="margin:0;font-size:.92rem;line-height:1.7">{{ submission.ai_feedback }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Grading Actions -->
+  <div class="card anim-up" style="padding:2rem">
+    <h4 style="margin-bottom:1.5rem">Grading Actions</h4>
+
+    <!-- Trigger AI -->
+    {% if submission.status != 'GRADED' %}
+    <form id="aiGradeForm" method="POST" action="{% url 'lms:grade_submission' submission.id %}" style="margin-bottom:1.25rem" onsubmit="prepareAIGrading(event)">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="ai_grade">
+      <input type="hidden" name="ai_provider" id="ai_provider_input">
+      <input type="hidden" name="ai_model" id="ai_model_input">
+      <input type="hidden" name="ai_api_key" id="ai_api_key_input">
+      <button type="submit" class="btn btn-outline" style="border-color:var(--accent-2);color:var(--accent-2)">
+        <i class="fa-solid fa-robot"></i> Run AI Grading
+      </button>
+      <span style="font-size:.82rem;color:var(--text-secondary);margin-left:.75rem">Uses your configured AI API to suggest a grade and feedback.</span>
+    </form>
+    <script>
+      function prepareAIGrading(event) {
+          const provider = localStorage.getItem("ai_provider");
+          const model = localStorage.getItem("ai_model");
+          const apiKey = localStorage.getItem("ai_api_key");
+          
+          if (!provider || !apiKey) {
+              event.preventDefault();
+              alert("Please configure your AI Provider and API Key in AI Settings first.");
+              window.location.href = "{% url 'lms:professor_ai_settings' %}";
+              return false;
+          }
+          
+          document.getElementById("ai_provider_input").value = provider;
+          document.getElementById("ai_model_input").value = model || "";
+          document.getElementById("ai_api_key_input").value = apiKey;
+      }
+    </script>
+
+    <hr class="form-divider">
+
+    <!-- Manual Publish -->
+    <form method="POST" action="{% url 'lms:grade_submission' submission.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="publish">
+      <div class="form-group">
+        <label>Final Grade (0 – {{ submission.exam.max_score }})</label>
+        <input type="number" name="grade" class="form-control" step="0.01" min="0" max="{{ submission.exam.max_score }}"
+               value="{{ submission.grade|default:'' }}" required style="max-width:200px">
+        <p class="form-text">This will be the official grade sent to the student.</p>
+      </div>
+      <button type="submit" class="btn btn-success"><i class="fa-solid fa-circle-check"></i> Publish Grade</button>
+    </form>
+    {% else %}
+    <div class="badge badge-success" style="padding:.75rem 1.5rem;font-size:.95rem">
+      <i class="fa-solid fa-circle-check"></i> This submission has been graded: {{ submission.grade }} / {{ submission.exam.max_score }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

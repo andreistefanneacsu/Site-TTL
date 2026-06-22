@@ -1,0 +1,103 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Module Details - TTL Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Admin Management</p>
+    <a href="{% url 'accounts:manage_users' %}" class="sidebar-link"><i class="fa-solid fa-users"></i> Manage Users</a>
+    <a href="{% url 'lms:admin_manage_modules' %}" class="sidebar-link active"><i class="fa-solid fa-book"></i> Manage Content</a>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <div class="dashboard-header" style="border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 30px;">
+      <div>
+        <h2 class="dashboard-title">{{ module.module_code }} - {{ module.title }}</h2>
+        <a href="{% url 'lms:admin_manage_modules' %}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;"><i class="fa-solid fa-arrow-left"></i> Back to Modules</a>
+      </div>
+    </div>
+
+    <!-- Courses Section -->
+    <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; color: var(--accent);"><i class="fa-solid fa-book-open"></i> Courses (Theory)</h3>
+            <a href="{% url 'lms:admin_add_course' module.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Add Course</a>
+        </div>
+        <div class="table-wrap anim-up">
+            <table>
+                <thead><tr><th>Order</th><th>Title</th><th>Content Preview</th></tr></thead>
+                <tbody>
+                    {% for c in courses %}
+                    <tr>
+                        <td>{{ c.display_order }}</td>
+                        <td style="font-weight: bold;">{{ c.title }}</td>
+                        <td style="color: var(--text-secondary); font-size: 0.85rem;">{{ c.content|truncatewords:15 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align: center; color: var(--text-secondary);">No courses added yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Laboratories Section -->
+    <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; color: var(--accent-2);"><i class="fa-solid fa-network-wired"></i> Laboratories (Practice)</h3>
+            <a href="{% url 'lms:admin_add_lab' module.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Add Lab</a>
+        </div>
+        <div class="table-wrap anim-up" style="animation-delay: 0.1s;">
+            <table>
+                <thead><tr><th>ID</th><th>Title</th><th>Has Topology?</th></tr></thead>
+                <tbody>
+                    {% for l in labs %}
+                    <tr>
+                        <td>{{ l.id }}</td>
+                        <td style="font-weight: bold;">{{ l.title }}</td>
+                        <td>
+                            {% if l.starting_topology %}
+                                <span style="color: var(--success);"><i class="fa-solid fa-check"></i> Yes</span>
+                            {% else %}
+                                <span style="color: var(--danger);"><i class="fa-solid fa-xmark"></i> No</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align: center; color: var(--text-secondary);">No laboratories added yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Exams Section -->
+    <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0; color: var(--danger);"><i class="fa-solid fa-file-signature"></i> Exams</h3>
+            <a href="{% url 'lms:admin_add_exam' module.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Add Exam</a>
+        </div>
+        <div class="table-wrap anim-up" style="animation-delay: 0.2s;">
+            <table>
+                <thead><tr><th>Title</th><th>Type</th><th>Difficulty</th><th>Score Range</th></tr></thead>
+                <tbody>
+                    {% for e in exams %}
+                    <tr>
+                        <td style="font-weight: bold;">{{ e.title }}</td>
+                        <td><span class="badge badge-accent">{{ e.exam_type }}</span></td>
+                        <td>{{ e.difficulty }}</td>
+                        <td style="color: var(--text-secondary); font-size: 0.85rem;">Pass: {{ e.passing_score }} / Max: {{ e.max_score }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">No exams added yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

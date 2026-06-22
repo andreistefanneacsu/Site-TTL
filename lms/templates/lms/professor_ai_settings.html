@@ -1,0 +1,89 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Settings - TTL{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Professor</p>
+    <a href="{% url 'lms:professor_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="{% url 'accounts:add_student' %}" class="sidebar-link"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+    <a href="{% url 'lms:professor_ai_settings' %}" class="sidebar-link active"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="{% url 'accounts:profile' %}" class="sidebar-link"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">Settings</h2>
+      </div>
+    </div>
+
+    <!-- Tabs Header -->
+    <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px;">
+        <a href="{% url 'lms:professor_settings_general' %}" style="padding: 10px 0; color: var(--text-secondary); text-decoration: none; border-bottom: 2px solid transparent;">General</a>
+        <a href="{% url 'lms:professor_ai_settings' %}" style="padding: 10px 0; color: var(--primary); font-weight: bold; text-decoration: none; border-bottom: 2px solid var(--primary);">AI Grading</a>
+    </div>
+
+    <div style="max-width: 600px;">
+        <h3 style="margin-bottom: 10px;">Configure AI Grading Agent</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
+            Set up your own AI API key to automatically grade exams and provide feedback. 
+            Without this, you will have to manually grade all submissions.
+        </p>
+        
+        <div style="background-color: var(--surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+            <form id="aiSettingsForm">
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Provider</label>
+                    <select id="provider" name="provider" style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+                        <option value="" style="background-color: #1E1E2E; color: #CDD6F4;">-- Select Provider --</option>
+                        {% for p in providers %}
+                            <option value="{{ p }}" style="background-color: #1E1E2E; color: #CDD6F4;">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">Model Name</label>
+                    <input type="text" id="model" name="model" style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;" placeholder="e.g. gemini-1.5-flash, gpt-4o, claude-3-opus-20240229">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: bold;">API Key</label>
+                    <input type="password" id="api_key" name="api_key" placeholder="Enter your API Key" style="width: 100%; padding: 10px; background-color: var(--background); color: var(--text); border: 1px solid var(--border); border-radius: 4px;">
+                </div>
+                
+                <button type="button" onclick="saveSettings()" style="background-color: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Save Settings</button>
+            </form>
+            <div id="saveMessage" style="margin-top: 10px; color: #a6e3a1; display: none;">Settings saved to local storage successfully.</div>
+        </div>
+    </div>
+  </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (localStorage.getItem("ai_provider")) {
+            document.getElementById("provider").value = localStorage.getItem("ai_provider");
+        }
+        if (localStorage.getItem("ai_model")) {
+            document.getElementById("model").value = localStorage.getItem("ai_model");
+        }
+        if (localStorage.getItem("ai_api_key")) {
+            document.getElementById("api_key").value = localStorage.getItem("ai_api_key");
+        }
+    });
+
+    function saveSettings() {
+        localStorage.setItem("ai_provider", document.getElementById("provider").value);
+        localStorage.setItem("ai_model", document.getElementById("model").value);
+        localStorage.setItem("ai_api_key", document.getElementById("api_key").value);
+        
+        const msg = document.getElementById("saveMessage");
+        msg.style.display = "block";
+        setTimeout(() => msg.style.display = "none", 3000);
+    }
+</script>
+{% endblock %}

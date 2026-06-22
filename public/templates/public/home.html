@@ -1,0 +1,47 @@
+{% extends 'public/base.html' %}
+{% block title %}Home{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-content anim-up">
+    <span class="hero-eyebrow"><i class="fa-solid fa-network-wired"></i> Network Simulation Platform</span>
+    <h1>Master Networking<br>Through Simulation</h1>
+    <p>Build real-world topologies, configure routers, take exams and get AI-graded results — all in one platform built for networking students.</p>
+    <div class="hero-actions">
+      <a href="{% url 'public:download' %}" class="btn btn-primary"><i class="fa-solid fa-download"></i> Download Simulator</a>
+      <a href="{% url 'public:modules' %}" class="btn btn-outline"><i class="fa-solid fa-book-open"></i> Explore Modules</a>
+    </div>
+    <div class="hero-badge"><i class="fa-solid fa-circle-check"></i> Free for enrolled students &nbsp;·&nbsp; <i class="fa-solid fa-circle-check"></i> AI-powered grading &nbsp;·&nbsp; <i class="fa-solid fa-circle-check"></i> Real CLI simulation</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-header anim-up">
+    <h2>Everything You Need to Excel</h2>
+    <p>A comprehensive learning ecosystem — from interactive desktop simulations to AI-graded assessments.</p>
+  </div>
+  <div class="card-grid">
+    <div class="card anim-up delay-1">
+      <div class="card-icon"><i class="fa-solid fa-desktop"></i></div>
+      <h3>Topology Simulator</h3>
+      <p>A lightweight desktop app for configuring routers, switches and PCs using real RETELISTICA-style CLI commands.</p>
+    </div>
+    <div class="card anim-up delay-2">
+      <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+      <h3>Structured Curriculum</h3>
+      <p>Enroll in modules aligned with RETELISTICA standards. Read course material, complete labs, sit exams — all in one place.</p>
+    </div>
+    <div class="card anim-up delay-3">
+      <div class="card-icon"><i class="fa-solid fa-robot"></i></div>
+      <h3>AI-Assisted Grading</h3>
+      <p>Professors can trigger Gemini AI to evaluate submissions instantly, then review and publish the final grade.</p>
+    </div>
+    <div class="card anim-up delay-4">
+      <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3>Role-Based Access</h3>
+      <p>Students, professors, moderators and admins — every role gets a tailored, secure interface built for their needs.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'public/base.html' %}
+{% block title %}{% if action == 'Create' %}New Module{% else %}Edit Module{% endif %}{% endblock %}
+{% block content %}
+<style>
+  select option { background-color: #1E1E2E; color: #CDD6F4; }
+</style>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:8rem 1.5rem 4rem">
+  <div class="card glass form-card form-card-wide anim-up">
+    <h2 style="margin-bottom:1.75rem">{{ action }} Module</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group"><label>Title</label><input type="text" name="title" class="form-control" required></div>
+      <div class="form-group"><label>Description</label><textarea name="description" class="form-control" rows="4"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Credits</label><input type="number" name="credits" class="form-control" min="1" max="30" required></div>
+        <div class="form-group"><label>Module Image URL (optional)</label><input type="text" name="image_url" class="form-control"></div>
+      </div>
+      <div class="form-group">
+        <label>Coordinator Professor</label>
+        <select name="coordinator_id" class="form-control">
+          <option value="">— None yet —</option>
+          {% for prof in professors %}
+          <option value="{{ prof.user_id }}">{{ prof.user.first_name }} {{ prof.user.last_name }} ({{ prof.academic_title }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-actions">
+        <a href="{% url 'moderation:dashboard' %}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">{{ action }} Module</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

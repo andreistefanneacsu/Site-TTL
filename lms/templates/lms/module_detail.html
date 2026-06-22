@@ -1,0 +1,93 @@
+{% extends 'public/base.html' %}
+{% block title %}{{ module.title }}{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Navigation</p>
+    <a href="{% url 'lms:student_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    <a href="#courses" class="sidebar-link"><i class="fa-solid fa-book"></i> Courses</a>
+    <a href="#labs" class="sidebar-link"><i class="fa-solid fa-flask"></i> Laboratories</a>
+    <a href="#exams" class="sidebar-link"><i class="fa-solid fa-pen-to-square"></i> Exams</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">{{ module.title }}</h2>
+        <p style="margin:0;font-size:.9rem">{{ module.description }}</p>
+      </div>
+      <span class="badge badge-accent" style="font-size:.9rem">{{ module.credits }} Credits</span>
+    </div>
+
+    <!-- Courses -->
+    <h3 id="courses" style="margin-bottom:1.25rem"><i class="fa-solid fa-book" style="color:var(--accent)"></i> Course Material</h3>
+    {% for course in courses %}
+    <div class="card anim-up" style="margin-bottom:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h4>{{ course.display_order }}. {{ course.title }}</h4>
+      </div>
+      <div style="background:rgba(0,0,0,.2);padding:1.5rem;border-radius:var(--radius-sm);color:var(--text-secondary);line-height:1.8;white-space:pre-line">{{ course.content }}</div>
+    </div>
+    {% empty %}
+    <div class="card" style="text-align:center;padding:2.5rem;margin-bottom:1.5rem"><p>No courses uploaded yet.</p></div>
+    {% endfor %}
+
+    <!-- Labs -->
+    <h3 id="labs" style="margin:2.5rem 0 1.25rem"><i class="fa-solid fa-flask" style="color:var(--accent)"></i> Laboratories</h3>
+    <div class="card-grid" style="margin-bottom:1.5rem">
+      {% for lab in labs %}
+      <div class="card">
+        <h4>{{ lab.title }}</h4>
+        <p style="font-size:.88rem">{{ lab.instructions|truncatewords:30 }}</p>
+        <div style="margin-top:1rem;padding:.75rem;background:rgba(0,0,0,.25);border-radius:var(--radius-sm);font-family:monospace;font-size:.78rem;color:var(--text-secondary);overflow-x:auto;border:1px solid var(--border)">
+          {{ lab.starting_topology|pprint }}
+        </div>
+        <p style="margin-top:.75rem;font-size:.8rem"><i class="fa-solid fa-circle-info" style="color:var(--accent-3)"></i> Open this lab in the <strong>Desktop Simulator App</strong> to configure the topology.</p>
+      </div>
+      {% empty %}
+      <div class="card" style="text-align:center;padding:2.5rem"><p>No labs uploaded yet.</p></div>
+      {% endfor %}
+    </div>
+
+    <!-- Exams -->
+    <h3 id="exams" style="margin:2.5rem 0 1.25rem"><i class="fa-solid fa-pen-to-square" style="color:var(--accent)"></i> Exams</h3>
+    <div class="card-grid">
+      {% for item in exam_data %}
+      {% with exam=item.exam %}
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem">
+          <h4>{{ exam.title }}</h4>
+          <span class="badge {% if exam.exam_type == 'THEORY' %}badge-success{% elif exam.exam_type == 'PRACTICAL' %}badge-warning{% else %}badge-accent{% endif %}">{{ exam.exam_type }}</span>
+        </div>
+        <p style="font-size:.85rem">{{ exam.requirement_text|truncatewords:20 }}</p>
+        <div style="display:flex;gap:.75rem;font-size:.8rem;color:var(--text-secondary);margin-bottom:1.25rem">
+          <span><i class="fa-solid fa-star"></i> Max: {{ exam.max_score }}</span>
+          <span><i class="fa-solid fa-flag"></i> Pass: {{ exam.passing_score }}</span>
+          <span><i class="fa-solid fa-gauge"></i> {{ exam.difficulty }}</span>
+        </div>
+
+        {% if item.submitted %}
+          <span class="badge badge-success" style="width:100%;justify-content:center;padding:.6rem"><i class="fa-solid fa-check"></i> Submitted</span>
+        {% elif exam.exam_type == 'THEORY' %}
+          {% if not item.enrolled %}
+            <form method="POST" action="{% url 'lms:enroll_exam' exam.id %}" style="margin-bottom:.5rem">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline btn-sm" style="width:100%">Enroll for Exam</button>
+            </form>
+          {% else %}
+            <a href="{% url 'lms:take_exam' exam.id %}" class="btn btn-primary" style="width:100%"><i class="fa-solid fa-pen"></i> Take Exam</a>
+          {% endif %}
+        {% else %}
+          <button class="btn btn-outline" style="width:100%;opacity:.45;cursor:not-allowed" disabled>
+            <i class="fa-solid fa-desktop"></i> Desktop App Only
+          </button>
+        {% endif %}
+      </div>
+      {% endwith %}
+      {% empty %}
+      <div class="card" style="text-align:center;padding:2.5rem"><p>No exams scheduled yet.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

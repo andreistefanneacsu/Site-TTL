@@ -1,0 +1,44 @@
+{% extends 'public/base.html' %}
+{% block title %}My Results{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <a href="{% url 'lms:student_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    <a href="{% url 'lms:my_results' %}" class="sidebar-link active"><i class="fa-solid fa-chart-bar"></i> My Results</a>
+    <a href="{% url 'accounts:profile' %}" class="sidebar-link"><i class="fa-solid fa-user"></i> Profile</a>
+  </aside>
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <h2 class="dashboard-title">My Exam Results</h2>
+    </div>
+    <div class="table-wrap anim-up">
+      <table>
+        <thead><tr><th>Exam</th><th>Module</th><th>Type</th><th>Grade</th><th>Status</th><th>Submitted</th></tr></thead>
+        <tbody>
+          {% for sub in submissions %}
+          <tr>
+            <td>{{ sub.exam.title }}</td>
+            <td style="color:var(--text-secondary)">{{ sub.exam.module.title }}</td>
+            <td><span class="badge badge-accent">{{ sub.exam.exam_type }}</span></td>
+            <td>
+              {% if sub.grade %}
+                <strong style="color:{% if sub.grade >= sub.exam.passing_score %}var(--success){% else %}var(--danger){% endif %}">{{ sub.grade }}</strong> / {{ sub.exam.max_score }}
+                {% if sub.ai_feedback %}
+                <br><small style="color:var(--text-secondary); display:block; margin-top:5px;"><i>Feedback: {{ sub.ai_feedback|truncatewords:10 }}</i></small>
+                {% endif %}
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              <span class="badge {% if sub.status == 'GRADED' %}badge-success{% elif sub.status == 'PENDING_REVIEW' %}badge-warning{% else %}badge-accent{% endif %}">{{ sub.status }}</span>
+            </td>
+            <td style="color:var(--text-secondary);font-size:.85rem">{{ sub.submitted_at|date:"d M Y, H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--text-secondary)">No submissions yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

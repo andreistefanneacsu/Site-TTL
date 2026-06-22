@@ -1,0 +1,7 @@
+django
+django-environ
+psycopg[binary]
+whitenoise[compression]
+gunicorn
+google-generativeai
+Pillow

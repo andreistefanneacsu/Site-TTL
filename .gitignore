@@ -1,0 +1,10 @@
+.env
+/accounts/__pycache__
+/accounts/migrations/__pycache__
+/lms/__pycache__
+/lms/migrations/__pycache__
+/moderation/__pycache__/
+/moderation/migrations/__pycache__/
+/public/__pycache__/
+/public/migrations/__pycache__/
+/topology_web/__pycache__/

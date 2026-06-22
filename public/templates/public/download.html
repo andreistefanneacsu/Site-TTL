@@ -1,0 +1,171 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Download Simulator{% endblock %}
+{% block nav_download %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    .download-hero {
+        padding: 80px 20px 40px;
+        text-align: center;
+        background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.12) 0%, rgba(5, 6, 11, 0) 100%);
+        min-height: 40vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .download-hero h1 {
+        font-family: var(--font-title);
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: var(--gradient-accent);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .download-hero p {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto 3rem;
+    }
+
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        max-width: 1100px;
+        margin: -50px auto 100px;
+        padding: 0 20px;
+    }
+
+    .download-card {
+        padding: 3rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .download-card i.os-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        color: var(--accent-3);
+        filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.3));
+    }
+
+    .download-card h2 {
+        font-family: var(--font-title);
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .download-card p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+        flex-grow: 1;
+    }
+
+    .btn-download {
+        width: 100%;
+        padding: 0.95rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .terminal-box {
+        background: rgba(0, 0, 0, 0.45);
+        border-radius: var(--radius-sm);
+        padding: 1.25rem;
+        width: 100%;
+        text-align: left;
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 0.88rem;
+        position: relative;
+        border: 1.5px solid var(--border);
+        margin-bottom: 1rem;
+    }
+
+    .terminal-box code {
+        color: #34d399;
+    }
+
+    .copy-hint {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+        text-align: center;
+    }
+
+    .release-info {
+        text-align: center;
+        padding: 4rem 20px;
+        border-top: 1px solid var(--border);
+    }
+
+    .release-info span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="download-hero">
+    <div class="container">
+        <h1>Master Your Topology</h1>
+        <p>Topology Tormentor Lite is now available for all major platforms. Build, simulate, and learn networking with
+            professional-grade tools.</p>
+    </div>
+</section>
+
+<section class="container">
+    <div class="cards-container">
+        <!-- Windows Card -->
+        <div class="download-card card">
+            <i class="fa-brands fa-windows os-icon"></i>
+            <h2>Windows</h2>
+            <p>Recommended for most users. Includes a dedicated installer with all dependencies pre-bundled for a smooth
+                setup on Windows 10 & 11.</p>
+            <a href="{% static 'downloads/TTL-Setup.exe' %}" class="btn btn-primary btn-download">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+                Download Installer (.exe)
+            </a>
+        </div>
+
+        <!-- Linux Card -->
+        <div class="download-card card">
+            <i class="fa-brands fa-linux os-icon"></i>
+            <h2>Linux / Git</h2>
+            <p>Professional installation via terminal. This method allows you to stay updated with the latest patches
+                directly from our repository.</p>
+
+            <div class="terminal-box">
+                <code>git clone https://github.com/andreistefanneacsu/Topology-Tormentor-Lite</code>
+            </div>
+            <p style="font-size: 0.85rem; margin-bottom: 0;">Then run the setup script:</p>
+            <div class="terminal-box" style="margin-top: 0.5rem;">
+                <code>./setup.sh</code>
+            </div>
+            <span class="copy-hint">Requires Python 3.8+ & Git</span>
+        </div>
+    </div>
+</section>
+
+<div class="release-info">
+    <div class="container">
+        <span>Current Stable: v1.2.0 | Release Date: May 2026 | Open Source under MIT License</span>
+    </div>
+</div>
+{% endblock %}

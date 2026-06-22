@@ -1,0 +1,27 @@
+{% extends 'public/base.html' %}
+{% block title %}Add Moderator{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:8rem 1.5rem 4rem">
+  <div class="card glass form-card anim-up">
+    <h2 style="margin-bottom:1.75rem"><i class="fa-solid fa-user-shield" style="color:var(--accent)"></i> Create Moderator</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" name="first_name" class="form-control" required></div>
+        <div class="form-group"><label>Last Name</label><input type="text" name="last_name" class="form-control" required></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" name="email" class="form-control" required></div>
+      <div class="form-group"><label>Temporary Password</label><input type="password" name="password" class="form-control" required></div>
+      <hr class="form-divider">
+      <div class="form-row">
+        <div class="form-group"><label>University</label><input type="text" name="university" class="form-control"></div>
+        <div class="form-group"><label>Faculty</label><input type="text" name="faculty" class="form-control"></div>
+      </div>
+      <div class="form-actions">
+        <a href="{% url 'accounts:manage_users' %}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create Moderator</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

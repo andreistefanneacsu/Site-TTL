@@ -1,0 +1,89 @@
+{% extends 'public/base.html' %}
+{% block title %}Professor Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Professor</p>
+    <a href="{% url 'lms:professor_dashboard' %}" class="sidebar-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="{% url 'accounts:add_student' %}" class="sidebar-link"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+    <a href="{% url 'lms:professor_settings_general' %}" class="sidebar-link"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="{% url 'accounts:profile' %}" class="sidebar-link"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">Professor Dashboard</h2>
+        <p style="margin:0;font-size:.9rem">{{ professor.academic_title }} · {{ professor.department }}</p>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">{{ modules|length }}</div><div class="stat-label">My Modules</div></div>
+      <div class="stat-card"><div class="stat-value">{{ pending|length }}</div><div class="stat-label">Pending Reviews</div></div>
+      <div class="stat-card"><div class="stat-value">{{ graded|length }}</div><div class="stat-label">Graded Recently</div></div>
+    </div>
+
+    <h3 style="margin-bottom:1.25rem">My Modules</h3>
+    <div class="card-grid" style="margin-bottom:3rem">
+      {% for module in modules %}
+      <div class="card module-card">
+        <div class="module-card-img">
+          {% if module.image_url %}
+            <img src="{{ module.image_url }}" alt="">
+          {% else %}
+            <i class="fa-solid fa-network-wired"></i>
+          {% endif %}
+        </div>
+        <div class="module-card-body">
+          <h3>{{ module.title }}</h3>
+          <p style="font-size:.85rem">{{ module.credits }} Credits</p>
+        </div>
+      </div>
+      {% empty %}
+      <div class="card" style="grid-column:1/-1;text-align:center;padding:3rem"><p>No modules assigned yet.</p></div>
+      {% endfor %}
+    </div>
+
+    <h3 style="margin-bottom:1.25rem"><i class="fa-solid fa-hourglass-half" style="color:var(--warning)"></i> Pending Submissions</h3>
+    <div class="table-wrap anim-up" style="margin-bottom:3rem">
+      <table>
+        <thead><tr><th>Student</th><th>Exam</th><th>Module</th><th>Submitted</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for sub in pending %}
+          <tr>
+            <td>{{ sub.student.user.first_name }} {{ sub.student.user.last_name }}</td>
+            <td>{{ sub.exam.title }}</td>
+            <td style="color:var(--text-secondary)">{{ sub.exam.module.title }}</td>
+            <td style="color:var(--text-secondary);font-size:.85rem">{{ sub.submitted_at|date:"d M Y" }}</td>
+            <td><a href="{% url 'lms:grade_submission' sub.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i> Grade</a></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-secondary)">No pending submissions.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-bottom:1.25rem"><i class="fa-solid fa-circle-check" style="color:var(--success)"></i> Recently Graded</h3>
+    <div class="table-wrap anim-up">
+      <table>
+        <thead><tr><th>Student</th><th>Exam</th><th>Grade</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for sub in graded %}
+          <tr>
+            <td>{{ sub.student.user.first_name }} {{ sub.student.user.last_name }}</td>
+            <td>{{ sub.exam.title }}</td>
+            <td><strong style="color:{% if sub.grade >= sub.exam.passing_score %}var(--success){% else %}var(--danger){% endif %}">{{ sub.grade }}</strong> / {{ sub.exam.max_score }}</td>
+            <td style="color:var(--text-secondary);font-size:.85rem">{{ sub.submitted_at|date:"d M Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-secondary)">No graded submissions yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

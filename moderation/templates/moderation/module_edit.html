@@ -1,0 +1,103 @@
+{% extends 'public/base.html' %}
+{% block title %}Edit: {{ module.title }}{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <a href="{% url 'moderation:dashboard' %}" class="sidebar-link"><i class="fa-solid fa-arrow-left"></i> All Modules</a>
+    <a href="#details" class="sidebar-link active"><i class="fa-solid fa-info-circle"></i> Details</a>
+    <a href="#professors" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Professors</a>
+    <a href="#courses" class="sidebar-link"><i class="fa-solid fa-book"></i> Courses</a>
+    <a href="#labs" class="sidebar-link"><i class="fa-solid fa-flask"></i> Labs</a>
+    <a href="#exams" class="sidebar-link"><i class="fa-solid fa-pen-to-square"></i> Exams</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <!-- Module Details -->
+    <div id="details" class="card anim-up" style="padding:2rem;margin-bottom:2rem">
+      <h3 style="margin-bottom:1.5rem">Module Details</h3>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-group"><label>Title</label><input type="text" name="title" class="form-control" value="{{ module.title }}" required></div>
+        <div class="form-group"><label>Description</label><textarea name="description" class="form-control" rows="3">{{ module.description }}</textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Credits</label><input type="number" name="credits" class="form-control" value="{{ module.credits }}" required></div>
+          <div class="form-group"><label>Image URL</label><input type="text" name="image_url" class="form-control" value="{{ module.image_url|default:'' }}"></div>
+        </div>
+        <div class="form-group"><label><input type="checkbox" name="is_active" {% if module.is_active %}checked{% endif %}> Module is Active</label></div>
+        <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- Assigned Professors -->
+    <div id="professors" class="card anim-up" style="padding:2rem;margin-bottom:2rem">
+      <h3 style="margin-bottom:1.5rem">Professors</h3>
+      {% for prof in professors %}
+      {% if prof.user_id in assigned %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem;background:rgba(0,0,0,.2);border-radius:var(--radius-sm);margin-bottom:.5rem">
+        <span>{{ prof.user.first_name }} {{ prof.user.last_name }} ({{ prof.academic_title }})</span>
+        <form method="POST" action="{% url 'moderation:remove_professor' module.id prof.user_id %}">
+          {% csrf_token %}<button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-times"></i></button>
+        </form>
+      </div>
+      {% endif %}
+      {% endfor %}
+      <form method="POST" action="{% url 'moderation:assign_professor' module.id %}" style="margin-top:1rem;display:flex;gap:.75rem;align-items:flex-end">
+        {% csrf_token %}
+        <div class="form-group" style="flex:1;margin:0">
+          <label>Assign Professor</label>
+          <select name="professor_id" class="form-control">
+            {% for prof in professors %}{% if prof.user_id not in assigned %}<option value="{{ prof.user_id }}">{{ prof.user.first_name }} {{ prof.user.last_name }}</option>{% endif %}{% endfor %}
+          </select>
+        </div>
+        <label style="display:flex;align-items:center;gap:.4rem;margin-bottom:.8rem;white-space:nowrap"><input type="checkbox" name="is_coordinator"> Coordinator</label>
+        <button type="submit" class="btn btn-outline btn-sm" style="margin-bottom:.8rem"><i class="fa-solid fa-plus"></i> Assign</button>
+      </form>
+    </div>
+
+    <!-- Courses -->
+    <div id="courses" class="card anim-up" style="padding:2rem;margin-bottom:2rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+        <h3>Courses</h3>
+        <a href="{% url 'moderation:course_create' module.id %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-plus"></i> Add Course</a>
+      </div>
+      {% for course in courses %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:rgba(0,0,0,.2);border-radius:var(--radius-sm);margin-bottom:.5rem">
+        <span><strong>{{ course.display_order }}.</strong> {{ course.title }}</span>
+        <div style="display:flex;gap:.5rem">
+          <a href="{% url 'moderation:course_edit' course.id %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-pen"></i></a>
+          <form method="POST" action="{% url 'moderation:course_delete' course.id %}" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button></form>
+        </div>
+      </div>
+      {% empty %}<p style="color:var(--text-secondary)">No courses added yet.</p>{% endfor %}
+    </div>
+
+    <!-- Labs -->
+    <div id="labs" class="card anim-up" style="padding:2rem;margin-bottom:2rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+        <h3>Laboratories</h3>
+        <a href="{% url 'moderation:lab_create' module.id %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-plus"></i> Add Lab</a>
+      </div>
+      {% for lab in labs %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:rgba(0,0,0,.2);border-radius:var(--radius-sm);margin-bottom:.5rem">
+        <span>{{ lab.title }}</span>
+        <form method="POST" action="{% url 'moderation:lab_delete' lab.id %}" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button></form>
+      </div>
+      {% empty %}<p style="color:var(--text-secondary)">No labs added yet.</p>{% endfor %}
+    </div>
+
+    <!-- Exams -->
+    <div id="exams" class="card anim-up" style="padding:2rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+        <h3>Exams</h3>
+        <a href="{% url 'moderation:exam_create' module.id %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-plus"></i> Add Exam</a>
+      </div>
+      {% for exam in exams %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:rgba(0,0,0,.2);border-radius:var(--radius-sm);margin-bottom:.5rem">
+        <span>{{ exam.title }} <span class="badge badge-accent" style="margin-left:.5rem">{{ exam.exam_type }}</span></span>
+        <form method="POST" action="{% url 'moderation:exam_delete' exam.id %}" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button></form>
+      </div>
+      {% empty %}<p style="color:var(--text-secondary)">No exams added yet.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Topology Tormentor - Master networking through simulation and interactive learning.{% endblock %}">
+    <title>{% block title %}Topology Tormentor{% endblock %} | TTL Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'public/css/style.css' %}?v=2">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar" id="main-navbar">
+    <a href="{% url 'public:home' %}" class="nav-brand">
+        <div class="logo-wrapper">
+            <svg class="ttl-logo-svg" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="ttl-grad-t1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#6366f1" />
+                        <stop offset="100%" stop-color="#8b5cf6" />
+                    </linearGradient>
+                    <linearGradient id="ttl-grad-t2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#8b5cf6" />
+                        <stop offset="100%" stop-color="#d946ef" />
+                    </linearGradient>
+                    <linearGradient id="ttl-grad-l" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#06b6d4" />
+                        <stop offset="100%" stop-color="#3b82f6" />
+                    </linearGradient>
+                    <filter id="ttl-glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2.5" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+                <!-- T 1 -->
+                <path d="M 12,10 H 28 M 20,10 V 30" stroke="url(#ttl-grad-t1)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+                <!-- T 2 -->
+                <path d="M 36,10 H 52 M 44,10 V 30" stroke="url(#ttl-grad-t2)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+                <!-- L -->
+                <path d="M 60,10 V 30 H 76" stroke="url(#ttl-grad-l)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+                <!-- Network Nodes (glowing endpoints) -->
+                <circle cx="20" cy="10" r="2" fill="#fff" filter="url(#ttl-glow)" />
+                <circle cx="44" cy="10" r="2" fill="#fff" filter="url(#ttl-glow)" />
+                <circle cx="76" cy="30" r="2" fill="#fff" filter="url(#ttl-glow)" />
+            </svg>
+            <span class="brand-text">Topology Tormentor</span>
+        </div>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+        <li><a href="{% url 'public:home' %}" class="{% block nav_home %}{% endblock %}">Home</a></li>
+        <li><a href="{% url 'public:modules' %}" class="{% block nav_modules %}{% endblock %}">Modules</a></li>
+        <li><a href="{% url 'public:download' %}" class="{% block nav_download %}{% endblock %}">Download</a></li>
+
+        {% if current_user %}
+            {% if account_type == 'STUDENT' %}
+                <li><a href="{% url 'lms:student_dashboard' %}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            {% elif account_type == 'PROFESSOR' %}
+                <li><a href="{% url 'lms:professor_dashboard' %}"><i class="fa-solid fa-chalkboard-user"></i> Dashboard</a></li>
+                <li><a href="{% url 'accounts:add_student' %}"><i class="fa-solid fa-user-plus"></i> Add Student</a></li>
+            {% elif account_type == 'MODERATOR' %}
+                <li><a href="{% url 'moderation:dashboard' %}"><i class="fa-solid fa-sliders"></i> Moderation</a></li>
+                <li><a href="{% url 'accounts:manage_users' %}"><i class="fa-solid fa-users-gear"></i> Users</a></li>
+            {% elif account_type == 'ADMIN' %}
+                <li><a href="{% url 'accounts:manage_users' %}"><i class="fa-solid fa-users-gear"></i> Users</a></li>
+                <li><a href="{% url 'moderation:dashboard' %}"><i class="fa-solid fa-sliders"></i> Moderation</a></li>
+            {% endif %}
+
+            <li class="nav-divider"></li>
+            <li>
+                <a href="{% url 'accounts:profile' %}" class="nav-avatar" title="{{ current_user.first_name }} {{ current_user.last_name }}">
+                    {% if current_user.profile_picture_url %}
+                        <img src="{{ current_user.profile_picture_url }}" alt="avatar" class="avatar-img">
+                    {% else %}
+                        <span class="avatar-placeholder">{{ current_user.first_name.0 }}{{ current_user.last_name.0 }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li><a href="{% url 'accounts:logout' %}" class="btn btn-outline btn-sm">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'accounts:login' %}" class="btn btn-primary btn-sm">Login</a></li>
+            <li><a href="{% url 'accounts:register' %}" class="btn btn-outline btn-sm">Register</a></li>
+        {% endif %}
+    </ul>
+
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
+<!-- Flash Messages -->
+{% if messages %}
+<div class="flash-messages" id="flash-messages">
+    {% for message in messages %}
+    <div class="flash flash-{{ message.tags }}">
+        <i class="fa-solid {% if message.tags == 'error' %}fa-circle-xmark{% elif message.tags == 'success' %}fa-circle-check{% else %}fa-circle-info{% endif %}"></i>
+        {{ message }}
+        <button class="flash-close" onclick="this.parentElement.remove()">✕</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <svg class="ttl-logo-svg footer-logo" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="ttl-grad-t1-f" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#6366f1" />
+                        <stop offset="100%" stop-color="#8b5cf6" />
+                    </linearGradient>
+                    <linearGradient id="ttl-grad-t2-f" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#8b5cf6" />
+                        <stop offset="100%" stop-color="#d946ef" />
+                    </linearGradient>
+                    <linearGradient id="ttl-grad-l-f" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#06b6d4" />
+                        <stop offset="100%" stop-color="#3b82f6" />
+                    </linearGradient>
+                    <filter id="ttl-glow-f" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2.5" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+                <path d="M 12,10 H 28 M 20,10 V 30" stroke="url(#ttl-grad-t1-f)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M 36,10 H 52 M 44,10 V 30" stroke="url(#ttl-grad-t2-f)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M 60,10 V 30 H 76" stroke="url(#ttl-grad-l-f)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="20" cy="10" r="2" fill="#fff" filter="url(#ttl-glow-f)" />
+                <circle cx="44" cy="10" r="2" fill="#fff" filter="url(#ttl-glow-f)" />
+                <circle cx="76" cy="30" r="2" fill="#fff" filter="url(#ttl-glow-f)" />
+            </svg>
+            <span class="brand-text">Topology Tormentor</span>
+        </div>
+        <p class="footer-tagline">Building tomorrow's network engineers, today.</p>
+        <div class="footer-links">
+            <a href="{% url 'public:home' %}">Home</a>
+            <a href="{% url 'public:modules' %}">Modules</a>
+            <a href="{% url 'public:download' %}">Download</a>
+            <a href="{% url 'accounts:login' %}">LMS</a>
+        </div>
+        <p class="footer-copy">&copy; 2026 Topology Tormentor Platform. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+// Hamburger toggle
+const hamburger = document.getElementById('nav-hamburger');
+const navLinks = document.getElementById('nav-links');
+hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+    hamburger.classList.toggle('active');
+});
+
+// Auto-dismiss flash messages
+setTimeout(() => {
+    const flashes = document.getElementById('flash-messages');
+    if (flashes) flashes.style.opacity = '0';
+    setTimeout(() => { if (flashes) flashes.remove(); }, 500);
+}, 4000);
+
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+    const navbar = document.getElementById('main-navbar');
+    if (window.scrollY > 40) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

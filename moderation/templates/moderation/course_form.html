@@ -1,0 +1,20 @@
+{% extends 'public/base.html' %}
+{% block title %}{{ action }} Course{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:8rem 1.5rem 4rem">
+  <div class="card glass form-card form-card-wide anim-up">
+    <h2 style="margin-bottom:.5rem">{{ action }} Course</h2>
+    <p style="margin-bottom:2rem">Module: <strong>{{ module.title }}</strong></p>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group"><label>Course Title</label><input type="text" name="title" class="form-control" value="{{ course.title|default:'' }}" required placeholder="e.g. Chapter 1: OSI Model"></div>
+      <div class="form-group"><label>Display Order</label><input type="number" name="display_order" class="form-control" value="{{ course.display_order|default:1 }}" min="1" required></div>
+      <div class="form-group"><label>Content</label><textarea name="content" class="form-control" rows="12" required placeholder="Course content (Markdown-friendly)...">{{ course.content|default:'' }}</textarea></div>
+      <div class="form-actions">
+        <a href="{% url 'moderation:module_edit' module.id %}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">{{ action }} Course</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

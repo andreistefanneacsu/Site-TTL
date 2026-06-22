@@ -1,0 +1,93 @@
+{% extends 'public/base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <p class="sidebar-title">Student</p>
+    <a href="{% url 'lms:student_dashboard' %}" class="sidebar-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="{% url 'lms:my_results' %}" class="sidebar-link"><i class="fa-solid fa-chart-bar"></i> My Results</a>
+    <a href="{% url 'accounts:profile' %}" class="sidebar-link"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="{% url 'lms:student_settings_general' %}" class="sidebar-link"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">Welcome back, {{ current_user.first_name }}!</h2>
+        <p style="margin:0;font-size:.9rem">{{ student.study_group }} · Enrolled {{ student.enrollment_year }}</p>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">{{ enrolled|length }}</div><div class="stat-label">Enrolled Modules</div></div>
+      <div class="stat-card"><div class="stat-value">{{ submissions|length }}</div><div class="stat-label">Submissions</div></div>
+      <div class="stat-card"><div class="stat-value">{{ available|length }}</div><div class="stat-label">Available Modules</div></div>
+    </div>
+
+    <!-- Quick Enroll -->
+    <div class="card glass-light" style="margin-bottom:3rem;padding:1.5rem">
+      <h4 style="margin-bottom:1rem"><i class="fa-solid fa-key" style="color:var(--accent)"></i> Quick Enroll by Code</h4>
+      <form method="POST" action="{% url 'lms:enroll_by_code' %}" style="display:flex;gap:1rem">
+        {% csrf_token %}
+        <input type="text" name="module_code" class="form-control" placeholder="Enter module code (e.g. NET101)" required style="max-width:300px">
+        <button type="submit" class="btn btn-primary btn-sm">Enroll Now</button>
+      </form>
+    </div>
+
+    <!-- Enrolled Modules -->
+    <h3 style="margin-bottom:1.25rem">My Modules</h3>
+    <div class="card-grid" style="margin-bottom:3rem">
+      {% for en in enrolled %}
+      <div class="card module-card">
+        <div class="module-card-img">
+          {% if en.module.image_url %}<img src="{{ en.module.image_url }}" alt="">
+          {% else %}<i class="fa-solid fa-network-wired"></i>{% endif %}
+        </div>
+        <div class="module-card-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem">
+            <h3>{{ en.module.title }}</h3>
+            <span class="badge badge-accent" style="font-size:.65rem">{{ en.module.module_code }}</span>
+          </div>
+          <p style="font-size:.85rem">{{ en.module.description|truncatewords:12 }}</p>
+          <div class="module-meta">
+            <span class="badge badge-accent">{{ en.module.credits }} Credits</span>
+            <a href="{% url 'lms:module_detail' en.module.id %}" class="btn btn-primary btn-sm">Open</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="card" style="grid-column:1/-1;text-align:center;padding:3rem">
+        <i class="fa-solid fa-book" style="font-size:2.5rem;color:var(--text-secondary);margin-bottom:1rem;display:block"></i>
+        <h4>No modules yet</h4><p>Enroll in a module below to get started.</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Available Modules -->
+    <h3 style="margin-bottom:1.25rem">Available Modules</h3>
+    <div class="card-grid">
+      {% for module in available %}
+      <div class="card glass-light">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem">
+          <h4 style="margin-bottom:0">{{ module.title }}</h4>
+          <span class="badge badge-accent" style="font-size:.65rem">{{ module.module_code }}</span>
+        </div>
+        <p style="font-size:.85rem">{{ module.description|truncatewords:15 }}</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem">
+          <span class="badge badge-accent">{{ module.credits }} CR</span>
+          <form method="POST" action="{% url 'lms:enroll_module' module.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline btn-sm">Enroll</button>
+          </form>
+        </div>
+      </div>
+      {% empty %}
+      <p style="color:var(--text-secondary)">All available modules have been enrolled.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

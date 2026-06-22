@@ -1,0 +1,56 @@
+{% extends 'public/base.html' %}
+{% block title %}Moderation Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Moderation</p>
+    <a href="{% url 'moderation:dashboard' %}" class="sidebar-link active"><i class="fa-solid fa-sliders"></i> All Modules</a>
+    <a href="{% url 'moderation:module_create' %}" class="sidebar-link"><i class="fa-solid fa-plus"></i> New Module</a>
+    <a href="{% url 'accounts:manage_users' %}" class="sidebar-link"><i class="fa-solid fa-users-gear"></i> Users</a>
+    <a href="{% url 'accounts:create_professor' %}" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Add Professor</a>
+    {% if account_type == 'ADMIN' %}
+    <a href="{% url 'accounts:create_moderator' %}" class="sidebar-link"><i class="fa-solid fa-user-shield"></i> Add Moderator</a>
+    {% endif %}
+    <a href="{% url 'accounts:profile' %}" class="sidebar-link"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <h2 class="dashboard-title">Module Management</h2>
+      <a href="{% url 'moderation:module_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Module</a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">{{ modules|length }}</div><div class="stat-label">Total Modules</div></div>
+      <div class="stat-card"><div class="stat-value">{{ modules|length }}</div><div class="stat-label">Active Modules</div></div>
+    </div>
+
+    <div class="table-wrap anim-up">
+      <table>
+        <thead><tr><th>Title</th><th>Credits</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for module in modules %}
+          <tr>
+            <td><strong>{{ module.title }}</strong></td>
+            <td>{{ module.credits }}</td>
+            <td><span class="badge {% if module.is_active %}badge-success{% else %}badge-danger{% endif %}">{% if module.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+            <td style="color:var(--text-secondary);font-size:.85rem">{{ module.created_at|date:"d M Y" }}</td>
+            <td>
+              <div style="display:flex;gap:.5rem">
+                <a href="{% url 'moderation:module_edit' module.id %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-pen"></i> Edit</a>
+                <form method="POST" action="{% url 'moderation:module_delete' module.id %}" onsubmit="return confirm('Delete this module?')">
+                  {% csrf_token %}<button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;padding:3rem;color:var(--text-secondary)">No modules yet. <a href="{% url 'moderation:module_create' %}">Create the first one.</a></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

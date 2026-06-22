@@ -1,0 +1,69 @@
+{% extends 'public/base.html' %}
+{% block title %}{{ exam.title }}{% endblock %}
+{% block content %}
+<div style="min-height:100vh;padding:8rem 5% 4rem;max-width:860px;margin:0 auto">
+  <div class="card glass anim-up" style="padding:3rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;gap:1rem;flex-wrap:wrap">
+      <div>
+        <h2 style="margin-bottom:.5rem">{{ exam.title }}</h2>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+          <span class="badge badge-success">{{ exam.exam_type }}</span>
+          <span class="badge badge-accent">{{ exam.difficulty }}</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <p style="font-size:.85rem;margin:0">Max score: <strong>{{ exam.max_score }}</strong></p>
+        <p style="font-size:.85rem;margin:0">Pass at: <strong>{{ exam.passing_score }}</strong></p>
+      </div>
+    </div>
+
+    <div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2);border-radius:var(--radius-sm);padding:1.5rem;margin-bottom:2rem">
+      <h4 style="color:var(--accent);margin-bottom:.5rem"><i class="fa-solid fa-circle-info"></i> Exam Requirement</h4>
+      <p style="margin:0;white-space:pre-line">{{ exam.requirement_text }}</p>
+    </div>
+
+    {% if exam.exam_type == 'PRACTICAL' and exam.starting_topology %}
+    <div style="background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.5rem;margin-bottom:2rem">
+      <h4 style="color:var(--accent-2);margin-bottom:.5rem"><i class="fa-solid fa-network-wired"></i> Reference Topology</h4>
+      <pre style="color:var(--text-secondary);font-size:.85rem;overflow-x:auto">{{ exam.starting_topology | pprint }}</pre>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'lms:take_exam' exam.id %}">
+      {% csrf_token %}
+      
+      {% if exam.starting_topology and exam.starting_topology.questions %}
+        <div class="form-group">
+          <label style="font-size: 1.2rem; margin-bottom: 15px; display: block;">Questions</label>
+          {% for q in exam.starting_topology.questions %}
+            <div style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+              <p style="font-weight: bold; margin-bottom: 10px;">{{ forloop.counter }}. {{ q.text }}</p>
+              {% for opt in q.options %}
+                <label style="display: block; margin-bottom: 5px; cursor: pointer; color: var(--text-secondary);">
+                  <input type="radio" name="q_{{ q.id }}" value="{{ forloop.counter0 }}" required style="margin-right: 10px;">
+                  {{ opt }}
+                </label>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="form-group">
+          {% if exam.exam_type == 'PRACTICAL' %}
+            <label>Solved Topology (JSON)</label>
+            <textarea name="answers" class="form-control" rows="12" placeholder="Paste your solved topology JSON here. You cannot edit once submitted." style="font-family: monospace; background: rgba(0,0,0,0.2); color: #d4d4d4;" required></textarea>
+          {% else %}
+            <label>Your Answers</label>
+            <textarea name="answers" class="form-control" rows="12" placeholder="Write your answers clearly here. You cannot edit once submitted." required></textarea>
+          {% endif %}
+          <p class="form-text">Once submitted, your answers cannot be changed.</p>
+        </div>
+      {% endif %}
+      <div class="form-actions">
+        <a href="{% url 'lms:module_detail' exam.module_id %}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Exam</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

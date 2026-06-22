@@ -1,0 +1,56 @@
+{% extends 'public/base.html' %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:8rem 1.5rem 4rem">
+  <div class="card glass form-card form-card-wide anim-up">
+    <div style="text-align:center;margin-bottom:2rem">
+      <h2 style="font-size:1.6rem">Create Student Account</h2>
+      <p style="margin:0;font-size:.9rem">Join the platform and start learning networking today</p>
+    </div>
+    <form method="POST" action="{% url 'accounts:register' %}">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" name="first_name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" name="last_name" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+      <hr class="form-divider">
+      <div class="form-row">
+        <div class="form-group">
+          <label>University</label>
+          <input type="text" name="university" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Faculty</label>
+          <input type="text" name="faculty" class="form-control" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Study Group</label>
+          <input type="text" name="study_group" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Enrollment Year</label>
+          <input type="number" name="enrollment_year" class="form-control" min="2000" max="2099" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">Create Account <i class="fa-solid fa-arrow-right"></i></button>
+    </form>
+    <p style="text-align:center;margin-top:1.5rem;font-size:.88rem">Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a></p>
+  </div>
+</div>
+{% endblock %}

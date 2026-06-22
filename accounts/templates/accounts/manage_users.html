@@ -1,0 +1,56 @@
+{% extends 'public/base.html' %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <aside class="sidebar">
+    <p class="sidebar-title">Admin Management</p>
+    <a href="{% url 'accounts:manage_users' %}" class="sidebar-link active"><i class="fa-solid fa-users"></i> Manage Users</a>
+    {% if viewer_role == 'ADMIN' %}
+    <a href="{% url 'lms:admin_manage_modules' %}" class="sidebar-link"><i class="fa-solid fa-book"></i> Manage Content</a>
+    {% endif %}
+    <a href="{% url 'accounts:logout' %}" class="sidebar-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+  
+  <div class="dashboard-body">
+    <div class="dashboard-header">
+      <h2 class="dashboard-title">User Management</h2>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <a href="{% url 'accounts:create_professor' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-user-tie"></i> Add Professor</a>
+        {% if viewer_role == 'ADMIN' %}
+        <a href="{% url 'accounts:create_moderator' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-user-shield"></i> Add Moderator</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="table-wrap anim-up">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th><th>Email</th><th>Role</th><th>University</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            {% if u.profile_picture_url %}
+              <img src="{{ u.profile_picture_url }}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:.5rem" alt="">
+            {% else %}
+              <span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--gradient);align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;vertical-align:middle;margin-right:.5rem">{{ u.first_name.0 }}{{ u.last_name.0 }}</span>
+            {% endif %}
+            {{ u.first_name }} {{ u.last_name }}
+          </td>
+          <td style="color:var(--text-secondary)">{{ u.email }}</td>
+          <td>
+            <span class="badge {% if u.account_type == 'ADMIN' %}badge-danger{% elif u.account_type == 'MODERATOR' %}badge-warning{% elif u.account_type == 'PROFESSOR' %}badge-accent{% else %}badge-success{% endif %}">
+              {{ u.account_type }}
+            </span>
+          </td>
+          <td style="color:var(--text-secondary)">{{ u.university|default:"—" }}</td>
+          <td><span class="badge {% if u.status == 'ACTIVE' %}badge-success{% else %}badge-danger{% endif %}">{{ u.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
